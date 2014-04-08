@@ -1,8 +1,8 @@
 <?php
 class YBKInvoicer_Model_SalesTreeMapper{
-	public $dbConnect = array('DB_USERNAME' => 'WHITEBOARD',
-			'DB_PASSWORD' => 'twss',
-			'DB_CONNECT'  => '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=)(PORT=1521))(CONNECT_DATA=(SID=inttest)))');
+	public $dbConnect = array('DB_USERNAME' => '',
+			'DB_PASSWORD' => '',
+			'DB_CONNECT'  => '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=)(PORT=1521))(CONNECT_DATA=(SID=)))');
 	public function areaMgr() {
 		$query = "select distinct
 				    scon.row_id area_mgr_row_id
