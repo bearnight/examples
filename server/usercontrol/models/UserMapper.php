@@ -1,0 +1,588 @@
+<?php
+class Usercontrol_Model_UserMapper{
+	
+	public function getUsers()
+	{
+		$query = 'select e.*,r.role_name from whiteboard.tbl_employee e '.
+		'inner join whiteboard.tbl_role r on r.role_id = e.base_role ';
+		
+		$db = new Whiteboard_Model_DB();
+		$params = array();
+		$db->select($query, $params);
+		$result = $db->getResult();
+		
+		$retval = array();
+		
+		
+
+		foreach ($result as $row)
+		{
+			
+			$user = new Whiteboard_Model_User();
+			$user->setEmployee_id($row->EMPLOYEE_ID)
+				->setFirst_name($row->FIRST_NAME)
+				->setLast_name($row->LAST_NAME)
+				->setBase_role($row->BASE_ROLE)
+				->setBase_role_name($row->ROLE_NAME);
+			$retval[]=$user;
+		}
+		return $retval;
+	}
+	public function getresoures()
+	{
+		$db = new Whiteboard_Model_DB();
+		$query ='select *
+				 from whiteboard.tbl_resource';
+		$params= array();
+		$db->select($query,$params);
+		$result = $db->getResult();
+		
+
+		foreach($result as $row)
+		{
+			$tbl= new Usercontrol_Model_resourcessettergetter();
+			$tbl->setResourceid($row->RESOURCE_ID)
+				->setResourceName($row->RESOURCE_NAME)
+				->setController($row->CONTROLLER)
+				->setUrl($row->URL);
+
+			$returnArray[]=$tbl;
+		}
+		return $returnArray;
+	}
+	public function mergeusers(Usercontrol_Model_userlistgettersetter $employee_id)
+	{
+		$db = new Whiteboard_Model_DB();
+		$query = 'DECLARE 
+				  obj whiteboard.t_employee:=whiteboard.t_employee();
+				  BEGIN 
+				  obj.extend;
+				  obj(1):=whiteboard.o_employee(:ids, :fname, :lname, :roled, :delted, :location, :contactid);
+				  whiteboard.pkg_employee_dml.proc_employee_merge(obj,:employee_id,:results);
+				  commit;
+				  end;';
+		 $newArray = array(':ids'         =>$employee_id->getEmployee(),
+		 				   ':fname'      =>$employee_id->getFirstName(),
+		 				   	':lname'     =>$employee_id->getLastName(),
+		 				    ':roled'     =>$employee_id->getRole(),
+		 					':delted'    =>$employee_id->getIsDelted(),
+		 					':location'  =>$employee_id->getLocation_id(),
+		 					':contactid' =>$employee_id->getContactid());
+		return 	$resultsed = $db->procexecute($query,$newArray,array(':employee_id',':results'));
+	}
+	public function getRoles()
+	{
+		$db = new Whiteboard_Model_DB();
+		$query ='Select * 
+				from whiteboard.tbl_role';
+		$params= array();
+		$db->select($query,$params);
+		$result = $db->getResult();
+		
+		foreach ($result as $row)
+		{
+			$tbl = new Usercontrol_Model_Usercontrolsettergetter();
+			$tbl->setRoleid($row->ROLE_ID)
+				->setRoleName($row->ROLE_NAME);
+			$returnArray[]=$tbl;
+			
+		}
+		return $returnArray;
+	}
+	public function getuserlist()
+	{
+		$db = new Whiteboard_Model_DB();
+		$query='Select *
+				from whiteboard.tbl_employee';
+		$params=array();
+		$db->select($query,$params);
+		$result = $db->getResult();
+		
+		foreach ($result as $row)
+		{
+			$tbl = new Usercontrol_Model_userlistgettersetter();
+			$tbl->setFirstName($row->FIRST_NAME)
+				->setLastName($row->LAST_NAME)
+				->setEmployee($row->EMPLOYEE_ID)
+				->setRole($row->BASE_ROLE)
+				->setContactid($row->INKS_CONTACT_ID)
+				->setLocation_id($row->LOCATION_ID);
+			$returnArray[]=$tbl;
+		}
+		return $returnArray;
+	}
+	public function searchusers(Usercontrol_Model_userlistgettersetter $user)
+	{
+	
+		$db= new Whiteboard_Model_DB();
+		$query ="Select *
+				from whiteboard.tbl_employee
+				where rtrim(ltrim(lower(first_name))) like lower(:fname) and rtrim(ltrim(lower(last_name))) like lower(:lname)";
+		$params = array(':fname'=>$user->getFirstName(),
+						':lname'=>$user->getLastName());
+	$db->select($query,$params);
+		$result = $db->getResult();
+		
+		foreach ($result as $row)
+		{
+			$tbl = new Usercontrol_Model_userlistgettersetter();
+			$tbl->setFirstName($row->FIRST_NAME)
+				->setLastName($row->LAST_NAME)
+				->setEmployee($row->EMPLOYEE_ID)
+				->setRole($row->BASE_ROLE)
+				->setContactid($row->INKS_CONTACT_ID)
+				->setLocation_id($row->LOCATION_ID);
+			$returnArray[]=$tbl;
+		}
+		return $returnArray;
+		
+	}
+	public function searchusersdelete(Usercontrol_Model_userlistgettersetter $user)
+	{
+	
+		$db= new Whiteboard_Model_DB();
+		$query ="Select *
+				from whiteboard.tbl_employee
+				where rtrim(ltrim(lower(first_name))) like lower(:fname) and rtrim(ltrim(lower(last_name))) like lower(:lname)";
+		$params = array(':fname'=>$user->getFirstName(),
+				':lname'=>$user->getLastName());
+		$db->select($query,$params);
+		$result = $db->getResult();
+	
+		foreach ($result as $row)
+		{
+			$tbl = new Usercontrol_Model_userlistgettersetter();
+			$tbl->setFirstName($row->FIRST_NAME)
+			->setLastName($row->LAST_NAME)
+			->setEmployee($row->EMPLOYEE_ID)
+			->setRole($row->BASE_ROLE)
+			->setContactid($row->INKS_CONTACT_ID)
+			->setLocation_id($row->LOCATION_ID);
+			$returnArray[]=$tbl;
+		}
+		return $returnArray;
+	
+	}
+	public function deleteactions(Usercontrol_Model_resourcesrolesettergetter $user)
+	{
+		$db = new Whiteboard_Model_DB();
+		$query = "Delete from tbl_employee_resource_action
+				where employee_id =:id AND resource_id = :rid";
+		$params = array(':id'=>$user->getEmployeeid(),
+						':rid'=>$user->getResourcesid());
+		$db->execute($query, $params);
+		$result =$db->getResult();
+		return $result;
+	}
+	public function deleteresource(Usercontrol_Model_resourcesrolesettergetter $user)
+	{
+		$db = new Whiteboard_Model_DB();
+		$query = "Delete from tbl_employee_resource_role
+				where employee_id =:id AND resource_id = :rid";
+		$params = array(':id'=>$user->getEmployeeid(),
+				':rid'=>$user->getResourcesid());
+		$db->execute($query, $params);
+		return $result;
+	}
+	public function addresources(Usercontrol_Model_resourcessettergetter $resources)
+	{
+		$db = new Whiteboard_Model_DB();
+		
+		$query_id='select (max(resource_id) + 1) AS ID
+				   from whiteboard.tbl_resource';
+		$query_id= $db->select($query_id);
+		$result_id=$db->getResult();
+
+		$result_id=$result_id[0];
+		
+		$db = new Whiteboard_Model_DB();
+		if ($resources->getResourceid() != NULL )
+		{
+			$query='update whiteboard.tbl_resource 
+					Set RESOURCE_NAME =:name,
+					    URL =:url,
+					    CONTROLLER =:controller
+					where RESOURCE_ID = :id';
+			$newArray = array(':id' =>$resources->getResourceid(),
+					':name'=>$resources->getResourceName(),
+					':url' =>$resources->getUrl(),
+					':controller' =>$resources->getController());
+		}
+		else
+		{
+		$query='insert into whiteboard.tbl_resource (RESOURCE_ID,RESOURCE_NAME,URL,CONTROLLER)
+				values
+				(:id,:name,:url,:controller)';
+		$newArray = array(':id' =>$result_id->ID,
+						  ':name'=>$resources->getResourceName(),
+						  ':url' =>$resources->getUrl(),
+						  ':controller' =>$resources->getController());
+		}
+
+// 	var_dump($newArray);
+// echo $query;
+// print_r($newArray);
+ 		return $db->execute($query,$newArray);
+		
+	}
+	public function getaction()
+	{
+		$db= new Whiteboard_Model_DB();
+		$query ='Select *
+				from
+				whiteboard.tbl_action join whiteboard.tbl_resource
+				on WHITEBOARD.TBL_ACTION.RESOURCE_ID=WHITEBOARD.TBL_RESOURCE.RESOURCE_ID';
+		$params=array();
+		$db->select($query,$params);
+		$result = $db->getResult();
+		foreach ($result as $row)
+		{
+			$tbl = new Usercontrol_Model_actionsettergetter();
+			$tbl->setResourceid($row->RESOURCE_ID)
+				->setActionid($row->ACTION_ID)
+				->setActionname($row->ACTION_NAME)
+				->setActions($row->ACTION)
+				->setUrl($row->URL)
+				->setResourceName($row->RESOURCE_NAME);
+			$returnArray[]=$tbl;
+		}
+
+ 		return $returnArray;
+	
+	}
+	public function addaction(Usercontrol_Model_actionsettergetter $actionss)
+	{
+		if(is_null($actionss->getActionid()))
+		{
+			$db= new Whiteboard_Model_DB();
+			$query ='Select (max(action_id)+1) as action_id
+					from whiteboard.tbl_action
+					where resource_id = :id';
+			$params= array(':id'=>$actionss->resource_id);
+			$db->select($query,$params);
+			$result_id=$db->getResult();
+			$result_id = (int)$result_id[0]->ACTION_ID;
+
+
+	
+				$actionss->setActionid($result_id);
+				$db= new Whiteboard_Model_DB();
+				
+				$query='insert into whiteboard.tbl_action (RESOURCE_ID, ACTION_ID, ACTION_NAME, ACTION,URL)
+					values
+					(:id, :aid, :names, :acts, :urls)';
+				$newArrays = array(':id'    =>$actionss->getResourceid(),
+						':aid'   =>$actionss->getActionid(),
+						':names' =>$actionss->getActionname(),
+						':acts'  =>$actionss->getActions(),
+						':urls'  =>$actionss->getUrl());
+
+		}
+		else  
+		{
+// 			$actionss->setActionid($result_id);
+// 			var_dump($result_id);
+			$db= new Whiteboard_Model_DB();
+			
+			$query='update whiteboard.tbl_action 
+					set 
+						ACTION_NAME = :names, 
+						ACTION = :acts,
+						URL = :urls
+					where action_id =:aid and RESOURCE_ID = :id';
+			$newArrays = array(':id'    =>$actionss->getResourceid(),
+					':aid'   =>$actionss->getActionid(),
+					':names' =>$actionss->getActionname(),
+					':acts'  =>$actionss->getActions(),
+					':urls'  =>$actionss->getUrl());
+			
+			
+		}
+
+		return $db->execute($query,$newArrays);
+		}
+	public function assignactions(Usercontrol_Model_actionsettergetter $setter)
+	{
+
+		$db = new Whiteboard_Model_DB();
+		$query ='select *
+					from WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION
+					where WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.EMPLOYEE_ID =:id
+					AND WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.RESOURCE_ID =:resources_id
+					AND WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.ACTION_ID=:action_id';
+		$params =array(':id'=>$setter->getEmployeeId(),
+				':resources_id'=>$setter->getResourceid(),
+				':action_id'=>$setter->getActionid());
+			
+		$db->select($query, $params);
+		$result=$db->getResult();
+		$acount =count($result);
+		
+		if ($acount > 0)
+		{
+			return $result;
+		}
+		else 
+		{
+			$db = new Whiteboard_Model_DB();
+			$query ='insert into WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION (EMPLOYEE_ID,RESOURCE_ID,ACTION_ID)
+					VALUES
+					(:id,:resources_id,:action_id)';
+			$params =array(':id'=>$setter->getEmployeeId(),
+						   ':resources_id'=>$setter->getResourceid(),
+						   ':action_id'=>$setter->getActionid());
+	
+			$db->execute($query, $params);
+			$result=$db->getResult();
+			return $result;
+		}
+	}
+	public function addemplist(Usercontrol_Model_resourcesrolesettergetter $resource)
+	{
+					$db = new Whiteboard_Model_DB();
+		
+					$query= 'select *
+							from WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE 
+							 where WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.EMPLOYEE_ID = :id
+							 AND WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.RESOURCE_ID =:resources_id';
+					$params=array(':id' =>$resource->getEmployeeid(),
+								  ':resources_id' =>$resource->getResourcesid());
+					$db->select($query,$params);
+					$result = $db->getResult();
+					
+					$acount=count($result);
+					
+					if($acount > 0)
+					{ 
+						return $result;
+					}
+					else 
+					{
+						$db = new Whiteboard_Model_DB();
+			
+						$query= 'insert into WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE (employee_id,resource_id,role_id)
+								 values
+								 (:id,:resources_id,:roles_id)';
+						$params=array(':id' =>$resource->getEmployeeid(),
+									  ':resources_id' =>$resource->getResourcesid(),
+									  ':roles_id'=>$resource->getRoles());
+						$db->execute($query,$params);
+						$result = $db->getResult();
+						return $result;
+					}
+	}
+	public function getactionslister()
+	{
+		$db= new Whiteboard_Model_DB();
+		$query = 'Select *
+					from WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION 
+					join WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE  on WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.RESOURCE_ID = WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.RESOURCE_ID
+					join WHITEBOARD.TBL_ACTION on WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.ACTION_ID = WHITEBOARD.TBL_ACTION.ACTION_ID
+					join WHITEBOARD.TBL_RESOURCE on WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.RESOURCE_ID= WHITEBOARD.TBL_RESOURCE.RESOURCE_ID
+					join WHITEBOARD.TBL_EMPLOYEE on WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.EMPLOYEE_ID = WHITEBOARD.TBL_EMPLOYEE.EMPLOYEE_ID';
+		$db->select($query);
+		$result = $db->getResult();
+		return $result;
+	}
+	public function addnewaction(Usercontrol_Model_actionsettergetter $addaction)
+	{
+		$db = new Whiteboard_Model_DB();
+		$query = 'insert into WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION (EMPLOYEE_ID,RESOURCE_ID,ACTION_ID,ORDERED)
+				  values
+				(:emp_id,:resource_id,:action,:orders)';
+		$params = array(':emp_id' =>$addaction->getEmployeeId(),
+						 ':resource_id' =>$addaction->getResourceid(),
+						 ':action' =>$addaction->getActionid(),
+						 ':orders' => $addaction->getOrder());
+		var_dump($query,$params);
+		$db->execute($query,$params);
+		$result = $db->getResult();
+		
+		return $result;
+	}
+	public function getresourcelistadd(Usercontrol_Model_resourcesrolesettergetter $addaction)
+	{
+		$db = new Whiteboard_Model_DB();
+		$query = 'Select *
+				  from WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE join WHITEBOARD.TBL_EMPLOYEE
+				  on WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.EMPLOYEE_ID = WHITEBOARD.TBL_EMPLOYEE.EMPLOYEE_ID
+				  where WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.EMPLOYEE_ID like rtrim(ltrim(:id)) 
+				  and WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.RESOURCE_ID like rtrim(ltrim(:resource_id))';
+		$params=(array(':id'=>$addaction->getEmployeeid(),
+					   ':resource_id'=>$addaction->getResourcesid()));
+		$db->select($query,$params);
+		$result=$db->getResult();
+		return $result;
+	}
+	public function getactionslist(Usercontrol_Model_actionlistsettergetter $actions)
+	{
+
+		$db = new Whiteboard_Model_DB();
+		$query =' Select *
+                  from WHITEBOARD.TBL_RESOURCE join WHITEBOARD.TBL_ACTION on WHITEBOARD.TBL_RESOURCE.RESOURCE_ID = WHITEBOARD.TBL_ACTION.RESOURCE_ID
+                  where WHITEBOARD.TBL_RESOURCE.RESOURCE_ID like rtrim(ltrim(:resource_id))';
+		$params = (array(':resource_id'=>$actions->getResourceid()));
+		$db->select($query,$params);
+		$result=$db->getResult();
+// 		var_dump(count($result));
+		$acount =count($result);
+		
+		if($acount >= 1)
+		{
+			foreach ($result as $row)
+			{
+				$tbl = new Usercontrol_Model_actionlistsettergetter();
+				$tbl->setResourceid($row->RESOURCE_ID)
+				->setActionid($row->ACTION_ID)
+				->setActionname($row->ACTION_NAME)
+				->setActions($row->ACTION)
+				->setUrl($row->URL)
+				->setResourceName($row->RESOURCE_NAME);
+				$returnArray[]=$tbl;
+			}
+			return $returnArray;
+		}
+	}
+	public function changesAction(Usercontrol_Model_actionsettergetter $actions)
+	{
+		$db = new Whiteboard_Model_DB();
+		$query ='Select *
+				 from WHITEBOARD.TBL_ACTION join WHITEBOARD.TBL_RESOURCE 
+				 on WHITEBOARD.TBL_ACTION.RESOURCE_ID = WHITEBOARD.TBL_RESOURCE.RESOURCE_ID 
+				 join WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE
+				 on WHITEBOARD.TBL_RESOURCE.RESOURCE_ID = WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.RESOURCE_ID
+				 where  WHITEBOARD.TBL_ = :id';
+		$params =array(':id'=>$actions->getResourcesid());
+		$db->select($query,$params);
+		$result= $db->getResult();
+		
+		foreach ($result as $row)
+		{
+			$tbl = new Usercontrol_Model_actionsettergetter();
+			$tbl->setResourceid($row->RESOURCE_ID)
+			->setActionid($row->ACTION_ID)
+			->setActionname($row->ACTION_NAME)
+			->setActions($row->ACTION)
+			->setUrl($row->URL)
+			->setResourceName($row->RESOURCE_NAME);
+			$returnArray[]=$tbl;
+		}
+		return $returnArray;
+	}
+	public function onemoretimeResources(Usercontrol_Model_resourcessettergetter $resources)
+	{
+		$db = new Whiteboard_Model_DB();
+		$query='Select *
+				from whiteboard.tbl_resource
+				where whiteboard.tbl_resource_id = :resources';
+		$params=array(':resources'=>$resources->getResourceid());
+		$db->select($query,$params);
+		$result =$db->getResult();
+		
+		foreach ($result as $row)
+		{
+			$tbl = new Usercontrol_Model_resourcessettergetter();
+			$tbl->setResourceid($row->RESOURCE_ID)
+				->setResourceName($row->RESOURE_NAME);
+			$resturnArray[]=$tbl;
+		}
+		return $resturnArray;
+		
+	}
+	public function actiondeletes($actionid,$resourceid)
+	{
+		$db = new Whiteboard_Model_DB();
+		$query = 'delete from WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION 
+				where WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.ACTION_ID =:a 
+				AND WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.RESOURCE_ID =:b';
+		$params =array(':a'=>$actionid,
+					   ':b'=>$resourceid);
+		$result=$db->execute($query, $params);
+		
+		$db = new Whiteboard_Model_DB();
+		
+		$query='delete from WHITEBOARD.TBL_ACTION
+				where WHITEBOARD.TBL_ACTION.ACTION_ID = :a AND WHITEBOARD.TBL_ACTION.RESOURCE_ID = :b';
+		$params =array(':a'=>$actionid,
+				':b'=>$resourceid);
+		$result = $db->execute($query, $params);
+		return $result;
+	}
+	public function resourcedeletesAction($resourceid)
+	{
+// 		var_dump($resourceid);
+		$db = new Whiteboard_Model_DB();
+		$query ='delete from WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE
+				 where WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.RESOURCE_ID = :a';
+		$params = array(':a'=>$resourceid);
+		$result = $db->execute($query, $params);
+		
+		$db = new Whiteboard_Model_DB();
+		$query ='delete from WHITEBOARD.TBL_RESOURCE
+				where WHITEBOARD.TBL_RESOURCE.RESOURCE_ID =:a';
+		$params = array(':a'=>$resourceid);
+		$reslut = $db->execute($query, $params);
+		
+	return $result;
+	}
+	public function getuserlists()
+	{
+		$db = new Whiteboard_Model_DB();
+		$query ='Select WHITEBOARD.TBL_ACTION.ACTION_NAME,WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.ACTION_ID,WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.RESOURCE_ID,
+                        WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.EMPLOYEE_ID, WHITEBOARD.TBL_RESOURCE.RESOURCE_name, WHITEBOARD.TBL_EMPLOYEE.FIRST_NAME,WHITEBOARD.TBL_EMPLOYEE.LAST_NAME
+                 from WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION inner join WHITEBOARD.TBL_ACTION
+                         on WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.ACTION_ID= WHITEBOARD.TBL_ACTION.ACTION_ID
+                         inner join WHITEBOARD.TBL_EMPLOYEE
+                         on WHITEBOARD.TBL_EMPLOYEE.EMPLOYEE_ID = WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.EMPLOYEE_ID
+                         inner join WHITEBOARD.TBL_RESOURCE
+                         on WHITEBOARD.TBL_RESOURCE.RESOURCE_ID = WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.RESOURCE_ID
+                         where WHITEBOARD.TBL_ACTION.ACTION_ID= WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.ACTION_ID AND WHITEBOARD.TBL_ACTION.RESOURCE_ID = WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.RESOURCE_ID
+                 order by WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ACTION.EMPLOYEE_ID';
+		 $db->select($query);
+		$result=$db->getResult();
+		foreach ($result as $row)
+		{
+			$tbl= new Usercontrol_Model_userlistgettersetter();
+			$tbl->setLastName($row->LAST_NAME)
+				->setFirstName($row->FIRST_NAME)
+				->setResouceName($row->RESOURCE_NAME)
+				->setActionName($row->ACTION_NAME)
+				->setEmployee($row->EMPLOYEE_ID)
+				->setActionID($row->ACTION_ID)
+				->setResourceID($row->RESOURCE_ID);
+			$returnArray[]=$tbl;
+		}
+		return $returnArray;
+		
+	}
+	public function getuserResources()
+	{
+		$db = new Whiteboard_Model_DB();
+		$query = 'Select WHITEBOARD.TBL_RESOURCE.RESOURCE_NAME,WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.EMPLOYEE_ID,WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.RESOURCE_ID, WHITEBOARD.TBL_EMPLOYEE.LAST_NAME,
+        				 WHITEBOARD.TBL_EMPLOYEE.FIRST_NAME
+				from WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE inner join WHITEBOARD.TBL_RESOURCE
+      				 on WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.RESOURCE_ID = WHITEBOARD.TBL_RESOURCE.RESOURCE_ID
+     				 inner join WHITEBOARD.TBL_EMPLOYEE
+     				 on WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.EMPLOYEE_ID = WHITEBOARD.TBL_EMPLOYEE.EMPLOYEE_ID
+				order by WHITEBOARD.TBL_EMPLOYEE_RESOURCE_ROLE.EMPLOYEE_ID';
+		$db->select($query);
+		$result = $db->getResult();
+		foreach($result as $row)
+		{
+			$tbl= new Usercontrol_Model_userlistgettersetter();
+			$tbl->setLastName($row->LAST_NAME)
+			    ->setFirstName($row->FIRST_NAME)
+			    ->setEmployee($row->EMPLOYEE_ID)
+			    ->setResouceName($row->RESOURCE_NAME)
+			    ->setResourceID($row->RESOURCE_ID);
+			$returnArray[]=$tbl;
+		}
+		return $returnArray;
+	}
+//	public function getUsersJson(){
+//		
+//		$data = $this->getUsers();
+//		//foreach($data as $row)
+//	}
+	
+}
