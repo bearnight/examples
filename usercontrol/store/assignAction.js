@@ -1,0 +1,25 @@
+Ext.define('usercontrol.store.assignAction',
+	{
+		extend:'Ext.data.Store',
+		model:'usercontrol.model.actionModel',
+		pageSize:100,
+//		autoLoad:true,
+		proxy:
+			{
+				type:'ajax',
+				url:'/usercontrol/data/placeaction',
+				reader:
+					{
+						type:'json',
+						root:'data'
+					},
+					simpleSortMode:true
+			},
+			sorters:
+				[
+					{
+						property:'resource_id',
+						direction:'ASC'
+					}
+				]
+	});	

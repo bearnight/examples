@@ -1,0 +1,22 @@
+Ext.define('usercontrol.store.assingEmp',{
+	extend:'Ext.data.Store',
+	model:'usercontrol.model.assignModel',
+	autoLoad:true,
+	pageSize:100,
+	proxy:
+		{
+			type:'ajax',
+			url:'/usercontrol/data/getdempassigns',
+			reader:
+				{
+					type:'json',
+					root:'data'
+				},
+				simpleSortMode:true
+		},
+		
+		sorters:[{
+			property:'LAST_NAME',
+			direction:'ASC'
+		}]
+});

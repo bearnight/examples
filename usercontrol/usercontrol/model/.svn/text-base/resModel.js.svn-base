@@ -1,0 +1,12 @@
+Ext.define('usercontrol.model.resModel',
+	{
+		extend:'Ext.data.Model',
+		fields:
+			[
+				'url',
+				'resource_name',
+				'resource_id',
+				'controller'
+			],
+	}
+);

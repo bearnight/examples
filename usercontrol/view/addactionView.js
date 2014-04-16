@@ -1,0 +1,23 @@
+Ext.define('usercontrol.view.addactionView',
+	{
+		extend:'Ext.container.Container',
+		requires:['usercontrol.component.addAction'],
+		alias:'widget.addactionView',
+		id:'addactionView',
+		hidden:true,
+		items:
+			[
+				{
+					xtype:'container',
+					autoFit:true,
+					items:
+						[
+							{
+								xtype:'addAction',
+								layout:'vbox',
+								width:400,
+							}
+						]
+				}
+			],
+	})

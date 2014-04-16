@@ -1,0 +1,274 @@
+Ext.define('usercontrol.controller.usercontrolController',
+	{
+		extend:'Ext.app.Controller',
+		stores:['userlists','roles','location','res','actions','reslist','assingEmp','assingactionEmp','resourceEmp','assignactions','actionlist'],
+		models:['userlist','rolesModel','locations','resModel','actionModel','reslistModel','assignModel','assignactionModel','resourceModel'],
+		init: function()
+		{
+			this.control(
+					{
+						//Employee Tab
+						'employee button[type="submit"]':
+							{
+								click: this.add
+							},
+							'employee button[type="reset"]':
+								{
+									click:this.reset
+								},
+								'#grided':
+								{
+									selectionchange: this.loadForm
+
+								},
+								//Resource Tab
+
+								'#resgrid':
+								{
+									selectionchange:this.loadresourcesForm
+
+								},
+							'resources button[type="submit"]':
+								{
+									click:this.update
+								},
+							'resources button[type="reset"]':
+								{
+									click:this.reset
+								},
+								//Action Tab
+							'actionForm button[type="submit"]':
+								{
+									click:this.addactions
+								},
+							'actionForm button[type="reset"]':
+								{
+									click:this.reset
+								},
+
+							'#actiongrid':
+								{
+									selectionchange:this.loadactionForm
+								},
+							//Assign user to resource
+							'assign button[type="reset"]':
+								{
+									click:this.reset
+								},
+							'assign button[type="submit"]':
+								{
+									click:this.search
+								},
+							'addResources button[type="reset"]':
+								{
+									click:this.reset
+								},
+							'addAction button[type="reset"]':
+								{
+									click:this.reset
+								},
+							'addAction button[type="submit"]':
+								{
+									click:this.loaderactionadd
+								},
+							'addAction button[type="cancel"]':
+								{
+									click:this.cancel
+								},
+							'addResources button[type="submit"]':
+								{
+									click:this.addResources
+								},
+							'#assignGrid':
+								{
+									selectionchange:this.loadEmp
+								},
+							'#assignAction':
+								{
+									selectionchange:this.loaderaction
+								},
+							'#resourceGrid':
+								{
+									selectionchange:this.loaderaction
+								}
+
+					});
+		},
+		search:function(_this,e,eOpts)
+		{
+			var formValues=_this.up('form').getValues(),
+			form=_this.up('form').getForm(),
+			grid=Ext.getCmp('assignGrid');
+			form.submit(
+					{
+						success:function(form,response)
+						{
+
+							Ext.getCmp('search').hide();
+							Ext.getCmp('addResources').show();
+							Ext.getCmp('addresourceView').show();
+							Ext.getCmp('assignGrid').show();
+							grid.store.load({params:{fname:formValues.fname,lname:formValues.lname}});
+							form=_this.up('form').getForm();
+							form.reset();
+						},
+					})
+		},
+		addResources:function(_this,e,eOpts)
+		{
+//			var controller=this;
+
+			// var formValues=_this.up('form').getValues(),
+
+			form=_this.up('form').getForm(),
+			grid=Ext.getCmp('addactions');
+			var eid= Ext.getCmp('emp_id').getValue();
+			var rid=Ext.getCmp('resource_idss').getValue();
+			form.submit(
+					{
+						success:function(form,response)
+						{
+							var resp = Ext.decode(response.response.responseText);
+							Ext.getCmp('addResources').hide();
+							Ext.getCmp('assignGrid').hide();
+							Ext.getCmp('addactionView').show();
+							Ext.getCmp('addAction').show();
+//							Ext.getCmp('actionGrid').show();
+							
+							Ext.getCmp('emp_ids').setValue(eid);
+							Ext.getCmp('resource_idsss').setValue(rid);
+							grid.getStore().load(
+								{
+									params : 
+									{
+										resource_id : resp.data[0].RESOURCE_ID
+									}
+								}
+							);
+							form = _this.up('form').getForm();
+							form.reset();
+							
+						}
+					})
+		},
+		reset: function(_this,e,eOpts)
+		{
+			form=_this.up('form').getForm();
+			form.reset()
+		},
+		cancel:function(_this,e,eOpts)
+		{
+			form=_this.up('form').getForm();
+			form.reset();
+			Ext.getCmp('addactionView').hide();
+			Ext.getCmp('addAction').hide(); 
+			Ext.getCmp('search').show();
+		},
+		addactions:function(_this,e,eOpts)
+		{
+			var formValues=_this.up('form').getValues(),
+			form=_this.up('form').getForm(),
+			grid=Ext.getCmp('actiongrid');
+			form.submit(
+							{
+								success:function(form,response)
+								{
+
+									grid.store.load();
+									form=_this.up('form').getForm();
+									form.reset()
+								}
+
+							}
+						)
+		},
+		update:function(_this,e,eOpts)
+		{
+			var formValues=_this.up('form').getValues(),
+			form=_this.up('form').getForm(),
+			grid=Ext.getCmp('resgrid');
+			form.submit(
+							{
+								success:function(form,response)
+								{
+									grid.store.load();
+									form=_this.up('form').getForm();
+									form.reset();
+
+								}
+							}
+						);
+		},
+		add: function(_this,e,eOpts)
+		{
+			var formValues=_this.up('form').getValues(),
+			form=_this.up('form').getForm(),
+			grid=Ext.getCmp('grided');
+			form.submit(
+							{
+								success:function(form,response)
+								{
+									grid.getStore('userlists').load();
+									form=_this.up('form').getForm();
+									form.reset();
+								}
+							}
+						);
+		},
+		loaderactionadd:function(_this,eOpts)
+		{
+
+			var formValues =_this.up('form').getValues(),
+			form=_this.up('form').getForm();
+		
+			form.submit(
+					{
+						success:function(form,response)
+						{
+							Ext.getCmp('addactionView').hide();
+							Ext.getCmp('addAction').hide();
+							Ext.getCmp('search').show();
+							form=_this.up('form').getForm();
+							form.reset();
+						}
+					})
+		},
+		loadresourcesForm:function(model,records)
+		{
+			if(records.length > 0)
+			{
+				Ext.ComponentQuery.query('resources')[0].getForm().loadRecord(records[0]);
+			}
+		},
+		loadForm:function(model,records)
+		{
+			if(records.length > 0)
+			{
+				Ext.ComponentQuery.query('employee')[0].getForm().loadRecord(records[0]);
+			}
+		},
+		loadactionForm:function(model,records)
+		{
+			if(records.length > 0)
+				{
+					Ext.ComponentQuery.query('actionForm')[0].getForm().loadRecord(records[0]);
+				}
+		},
+		loadEmp:function(model,records)
+		{
+			if(records.length >0)
+				{
+					Ext.ComponentQuery.query('addResources')[0].getForm().loadRecord(records[0]);
+				}
+		},
+		loaderaction:function(model,records)
+		{
+
+			if(records.length >0)
+				{
+					Ext.ComponentQuery.query('addAction')[0].getForm().loadRecord(records[0]);
+				}
+		},
+
+	}
+);

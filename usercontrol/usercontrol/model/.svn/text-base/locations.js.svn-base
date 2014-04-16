@@ -1,0 +1,9 @@
+Ext.define('usercontrol.model.locations',
+		{
+			extend:'Ext.data.Model',
+			fields:
+				[
+			    	{name:'id',type:'int',mapping:'location_id'},
+			    	'name'
+			    ],
+});

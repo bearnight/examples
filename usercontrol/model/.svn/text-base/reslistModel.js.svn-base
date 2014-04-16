@@ -1,0 +1,10 @@
+Ext.define('usercontrol.model.reslistModel',
+		{
+			extend:'Ext.data.Model',
+			fields:
+				[
+					{name:'resource_id'},
+					{name:'resource_name'}
+				]
+		}
+);

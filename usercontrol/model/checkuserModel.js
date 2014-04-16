@@ -1,0 +1,10 @@
+Ext.define('usercontrol.model.checkuserModel',
+		{
+			extend:'Ext.data.Model',
+			fields:
+				[
+					'name',
+					'resource_name',
+					'action_name',
+				],
+		});

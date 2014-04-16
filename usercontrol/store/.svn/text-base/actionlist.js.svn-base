@@ -1,0 +1,25 @@
+Ext.define('usercontrol.store.actionlist',
+	{
+		extend:'Ext.data.Store',
+		model:'usercontrol.model.actionModel',
+		pageSize:100,
+//		autoLoad:true,
+		proxy:
+			{
+				type:'ajax',
+				url:'/usercontrol/data/loadresource',
+				reader:
+					{
+						type:'json',
+						root:'data'
+					},
+					simpleSortMode:true
+			},
+			sorters:
+				[
+					{
+						property:'action_id',
+						direction:'ASC'
+					}
+				]
+	});	

@@ -1,0 +1,80 @@
+10
+
+dir
+1694
+svn://vcs.wpcec2dev.com:9642/wpcroot/Whiteboard/public/usercontrol
+svn://vcs.wpcec2dev.com:9642/wpcroot
+
+
+
+2013-02-07T15:03:20.577538Z
+363
+brianc
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+03578301-138f-4182-874d-696de411cede
+
+app.js
+file
+1732
+
+
+
+2013-06-10T17:58:46.195000Z
+f3e9c7ab08e6932e43eff2d157292b0c
+2013-06-14T18:20:44.182640Z
+1732
+chris
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+386
+
+component
+dir
+
+controller
+dir
+
+js
+dir
+
+model
+dir
+
+store
+dir
+
+view
+dir
+

@@ -1,0 +1,22 @@
+Ext.define('usercontrol.store.userlists',{
+	extend:'Ext.data.Store',
+	model:'usercontrol.model.userlist',
+	autoLoad:true,
+	pageSize:100,
+	proxy:
+		{
+			type:'ajax',
+			url:'/usercontrol/data/getuserlist',
+			reader:
+				{
+					type:'json',
+					root:'data'
+				},
+				simpleSortMode:true
+		},
+		
+		sorters:[{
+			property:'first_name',
+			direction:'ASC'
+		}]
+});

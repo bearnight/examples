@@ -1,0 +1,22 @@
+Ext.define('usercontrol.store.assingactionEmp',{
+	extend:'Ext.data.Store',
+	model:'usercontrol.model.assignactionModel',
+	autoLoad:true,
+	pageSize:100,
+	proxy:
+		{
+			type:'ajax',
+			url:'/usercontrol/data/loadresourceAction',
+			reader:
+				{
+					type:'json',
+					root:'data'
+				},
+				simpleSortMode:true
+		},
+		
+		sorters:[{
+			property:'fname',
+			direction:'ASC'
+		}]
+});

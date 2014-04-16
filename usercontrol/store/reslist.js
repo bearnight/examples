@@ -1,0 +1,25 @@
+Ext.define('usercontrol.store.reslist',
+		{
+			extend:'Ext.data.Store',
+			model:'usercontrol.model.reslistModel',
+			pageSize:100,
+			proxy:
+				{
+					type:'ajax',
+					url:'/usercontrol/data/getreslist',
+					reader:
+						{
+							type:'json',
+							root:'data'
+						},
+						simpleSortMode:true
+				},
+				sorters:
+					[
+						{
+							property:'resource_id',
+							direction:'ASC'
+						}
+					]
+				
+		})

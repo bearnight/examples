@@ -1,0 +1,17 @@
+requires:['usercontrol.view.employeeList',
+		  'usercontrol.view.usersForm',
+		  'usercontrol.view.resourceList',
+		  'usercontrol.view.resourceForm',
+		  'usercontrol.view.actionList',
+		  'usercontrol.view.actionsView' ,
+		  'usercontrol.view.assignEmp',
+		  'usercontrol.view.assignAction',
+		  'usercontrol.view.resourceEmp',
+		  'usercontrol.view.assignEmp',
+		  'usercontrol.view.assignEmp'],
+		  
+		  
+		  
+		 stores:['userlists','roles','location','res','actions','reslist','assingEmp','assingactionEmp','resourceEmp','assignactions'],
+		models:['userlist','rolesModel','locations','resModel','actionModel','reslistModel','assignModel','assignactionModel','resourceModel'],
+		

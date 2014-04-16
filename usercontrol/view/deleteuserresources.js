@@ -1,0 +1,21 @@
+Ext.define('usercontrol.view.deleteuserresources',
+	{
+		extend:'Ext.container.Container',
+		requires:['usercontrol.component.deleteAction'],
+		alias:'widget.deleteuserresources',
+		items:
+			[
+				{
+					xtype:'container',
+					autoFit:true,
+					items:
+						[
+							{
+								xtype:'deleteAction',
+								layout:'vbox',
+								width:400,
+							}
+						]
+				}
+			],
+	})

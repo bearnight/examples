@@ -1,0 +1,23 @@
+Ext.define('usercontrol.view.addResourceView',
+	{
+		extend:'Ext.container.Container',
+		requires:['usercontrol.component.addResources'],
+		alias:'widget.addResourceView',
+		id:'addresourceView',
+		hidden:true,
+		items:
+			[
+				{
+					xtype:'container',
+					autoFit:true,
+					items:
+						[
+							{
+								xtype:'addResources',
+								layout:'vbox',
+								width:400,
+							}
+						]
+				}
+			],
+	})

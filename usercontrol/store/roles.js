@@ -1,0 +1,15 @@
+Ext.define('usercontrol.store.roles',{
+	extend:'Ext.data.Store',
+	model:'usercontrol.model.rolesModel',
+	autoLoad:true,
+	proxy:
+		{
+			type:'ajax',
+			url:'/usercontrol/data/getroles',
+			reader:
+				{
+					type:'json',
+					root:'data'
+				}
+		},
+});
